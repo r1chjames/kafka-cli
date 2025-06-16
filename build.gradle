@@ -6,8 +6,8 @@ buildscript {
     }
     repositories {
         mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://packages.confluent.io/maven/" }
+        maven { url = "https://plugins.gradle.org/m2/" }
+        maven { url = "https://packages.confluent.io/maven/" }
 
     }
     dependencies {
@@ -19,7 +19,6 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: "eclipse"
-apply plugin: "com.commercehub.gradle.plugin.avro"
 apply plugin: "com.jfrog.artifactory"
 
 
@@ -38,9 +37,8 @@ group = "com.r1chjames"
 version = "0.0.1-SNAPSHOT"
 
 repositories {
-    jcenter()
     mavenCentral()
-    maven { url "https://packages.confluent.io/maven/" }
+    maven { url = "https://packages.confluent.io/maven/" }
 }
 
 dependencies {

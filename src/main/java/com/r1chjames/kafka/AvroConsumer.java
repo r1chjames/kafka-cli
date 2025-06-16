@@ -31,9 +31,8 @@ public class AvroConsumer {
     }
 
     private static void pollForRecords(final Properties props, final List<String> topics, final boolean shouldProcessFromBeginning) {
-        final var consumer = new KafkaConsumer<>(props);
 
-        try(consumer) {
+        try (var consumer = new KafkaConsumer<>(props)) {
 
             final var topicPartitions = topics
                     .stream()
@@ -70,7 +69,6 @@ public class AvroConsumer {
             System.err.println("An unexpected error occurred while consuming records: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            consumer.close();
             System.out.println("Consumer closed.");
         }
     }

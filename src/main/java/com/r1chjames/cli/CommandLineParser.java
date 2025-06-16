@@ -17,8 +17,6 @@ public class CommandLineParser {
         options.addOption(createRequiredOption(TOPICS));
         options.addOption(createRequiredOption(BOOTSTRAP_SERVERS));
         options.addOption(createRequiredOption(SCHEMA_REGISTRY));
-        options.addOption(createRequiredOption(DEFAULT_KEY_SERIALIZER));
-        options.addOption(createRequiredOption(DEFAULT_VALUE_SERIALIZER));
         options.addOption(createRequiredOption(DEFAULT_KEY_DESERIALIZER));
         options.addOption(createRequiredOption(DEFAULT_VALUE_DESERIALIZER));
         options.addOption(createRequiredOption(PRODUCE_COUNT));
