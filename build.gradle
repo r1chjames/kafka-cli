@@ -1,0 +1,55 @@
+buildscript {
+    ext {
+        kafkaVersion = '4.0.0'
+        confluentVersion = "7.9.1"
+        avroVersion = '1.12.0'
+    }
+    repositories {
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://packages.confluent.io/maven/" }
+
+    }
+    dependencies {
+        classpath "com.commercehub.gradle.plugin:gradle-avro-plugin:0.9.1"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: "eclipse"
+apply plugin: "com.commercehub.gradle.plugin.avro"
+apply plugin: "com.jfrog.artifactory"
+
+
+allprojects {
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = '24'
+        targetCompatibility = '24'
+    }
+}
+
+wrapper {
+    gradleVersion = '8.14.2'
+}
+
+group = "com.r1chjames"
+version = "0.0.1-SNAPSHOT"
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url "https://packages.confluent.io/maven/" }
+}
+
+dependencies {
+    implementation("org.apache.avro:avro:${avroVersion}",
+            "org.apache.avro:avro-maven-plugin:${avroVersion}",
+            "io.confluent:kafka-avro-serializer:${confluentVersion}",
+            "io.confluent:kafka-streams-avro-serde:${confluentVersion}",
+            "io.confluent:kafka-schema-registry:${confluentVersion}",
+            "org.apache.kafka:kafka-clients:${kafkaVersion}",
+            "commons-cli:commons-cli:1.9.0"
+    )
+}
