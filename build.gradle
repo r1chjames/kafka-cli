@@ -17,6 +17,7 @@ buildscript {
 
 plugins {
     id("io.freefair.lombok") version "8.12.1"
+    id 'checkstyle'
 }
 
 apply plugin: 'java'
@@ -25,10 +26,22 @@ apply plugin: "eclipse"
 
 allprojects {
     tasks.withType(JavaCompile) {
-        sourceCompatibility = '24'
-        targetCompatibility = '24'
+        sourceCompatibility = '21'
+        targetCompatibility = '21'
         options.compilerArgs << "-proc:full"
     }
+}
+
+checkstyle {
+    configFile = file('config/checkstyle/checkstyle.xml')
+}
+
+checkstyleMain {
+    source ='src/main/java'
+}
+
+checkstyleTest {
+    source ='src/test/java'
 }
 
 wrapper {
@@ -66,7 +79,8 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.13.1"),
             "org.junit.jupiter:junit-jupiter",
             "org.assertj:assertj-core:4.0.0-M1",
-            "org.mockito:mockito-core:5.18.0")
+            "org.mockito:mockito-core:5.18.0",
+            "org.mockito:mockito-junit-jupiter:5.18.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 }

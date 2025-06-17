@@ -7,16 +7,16 @@ import picocli.CommandLine;
 
 public class KafkaCli {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
 
         try {
             final var runner = new CommandRunner();
             runner.execute(args);
-        } catch (CommandLine.ParameterException | CliParameterException ex) {
+        } catch (final CommandLine.ParameterException | CliParameterException ex) {
             System.err.println("Error: " + ex.getMessage());
             System.err.println("Use --help for usage information.");
             System.exit(1);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             System.err.println("Unexpected error: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(2);

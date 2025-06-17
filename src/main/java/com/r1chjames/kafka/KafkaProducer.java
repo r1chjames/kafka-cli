@@ -1,8 +1,8 @@
 package com.r1chjames.kafka;
 
 import com.r1chjames.cli.CliParameterException;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.KafkaException;
@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
 import static com.r1chjames.cli.CommandLineConstants.*;
 
 @Builder
-@RequiredArgsConstructor
+@AllArgsConstructor
 @picocli.CommandLine.Command(
         name = "produce",
         description = "Produces to a Kafka topic"
@@ -74,7 +74,7 @@ public class KafkaProducer extends KafkaProperties implements Runnable {
 
 
         try {
-            IntStream.range(0, produceCount).boxed().toList().forEach(_ -> {
+            IntStream.range(0, produceCount).boxed().toList().forEach(i -> {
                 System.out.println(recordsSent.incrementAndGet());
                 sendStringMessage(producer, Arrays.stream(topic).findFirst().get(), produceString);
             });

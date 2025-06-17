@@ -1,6 +1,6 @@
 ARG BUILD_HOME=/kafka-cli
 
-FROM gradle:jdk24-corretto as build-image
+FROM gradle:jdk21-corretto as build-image
 
 ARG BUILD_HOME
 ENV APP_HOME=$BUILD_HOME
@@ -8,10 +8,11 @@ WORKDIR $APP_HOME
 
 COPY --chown=gradle:gradle build.gradle settings.gradle $APP_HOME/
 COPY --chown=gradle:gradle src $APP_HOME/src
+COPY --chown=gradle:gradle config $APP_HOME/config
 
 RUN gradle --no-daemon build
 
-FROM openjdk:24-jdk-slim
+FROM openjdk:21-jdk-slim
 
 ARG BUILD_HOME
 ENV APP_HOME=$BUILD_HOME

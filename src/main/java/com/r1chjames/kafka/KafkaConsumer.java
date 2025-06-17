@@ -1,6 +1,7 @@
 package com.r1chjames.kafka;
 
 import com.r1chjames.cli.CliParameterException;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Setter;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 import static com.r1chjames.cli.CommandLineConstants.*;
 
 @Builder
+@AllArgsConstructor
 @picocli.CommandLine.Command(
         name = "consume",
         description = "Consumed from a Kafka topic")

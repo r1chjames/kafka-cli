@@ -18,15 +18,15 @@ public class CommandLineConstantsTests {
 
     private static Stream<Arguments> constantList() {
         return Stream.of(
-                Arguments.of("spfb", SHOULD_PROCESS_FROM_BEGINNING),
-                Arguments.of("t", TOPICS),
-                Arguments.of("gi", GROUP_ID),
-                Arguments.of("bs", BOOTSTRAP_SERVERS),
-                Arguments.of("sr", SCHEMA_REGISTRY),
-                Arguments.of("dkd", DEFAULT_KEY_DESERIALIZER),
-                Arguments.of("dvd", DEFAULT_VALUE_DESERIALIZER),
-                Arguments.of("pc", PRODUCE_COUNT),
-                Arguments.of("ps", PRODUCE_STRING)
+                Arguments.of("-spfb", SHOULD_PROCESS_FROM_BEGINNING),
+                Arguments.of("-t", TOPICS),
+                Arguments.of("-gi", GROUP_ID),
+                Arguments.of("-bs", BOOTSTRAP_SERVERS),
+                Arguments.of("-sr", SCHEMA_REGISTRY),
+                Arguments.of("-dkd", DEFAULT_KEY_DESERIALIZER),
+                Arguments.of("-dvd", DEFAULT_VALUE_DESERIALIZER),
+                Arguments.of("-pc", PRODUCE_COUNT),
+                Arguments.of("-ps", PRODUCE_STRING)
         );
     }
 }
