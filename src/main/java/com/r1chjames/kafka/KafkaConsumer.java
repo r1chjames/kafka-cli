@@ -1,9 +1,11 @@
 package com.r1chjames.kafka;
 
-import com.r1chjames.cli.CommandLineParser;
-import org.apache.commons.cli.CommandLine;
+import com.r1chjames.cli.CliParameterException;
+import lombok.Builder;
+import lombok.Setter;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.SerializationException;
 
@@ -14,28 +16,53 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.r1chjames.cli.CommandLineOptions.*;
+import static com.r1chjames.cli.CommandLineConstants.*;
 
-public class AvroConsumer {
+@Builder
+@picocli.CommandLine.Command(
+        name = "consume",
+        description = "Consumed from a Kafka topic")
+public class KafkaConsumer extends KafkaProperties implements Runnable {
 
+    @Setter
+    @picocli.CommandLine.Option(names = {SHOULD_PROCESS_FROM_BEGINNING, SPFB},
+            description = "Should the consumer start from the beginning of the topic",
+            defaultValue = "false")
+    private boolean shouldProcessFromBeginning;
 
-    public void consume(final CommandLine commandLine) {
+    @Setter
+    @picocli.CommandLine.Option(names = {TOPICS, T},
+            description = "Comma-separated list of topics to consume from",
+            required = true)
+    private String[] topics;
 
-        final CommandLineParser commandLineParser = new CommandLineParser();
+    private Consumer<Object, Object> consumer;
+    private Properties props;
 
-        final var shouldProcessFromBeginning = commandLineParser.safeGetBooleanOptionValue(commandLine, SHOULD_PROCESS_FROM_BEGINNING);
-        final var topics = Arrays.stream(commandLineParser.safeGetStringOptionValue(commandLine, TOPICS).split(",")).toList();
+    private void init() {
+        try {
+            props = parsedConfig();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
-        final var props = new KafkaProperties().parsedConfig(commandLineParser, commandLine);
-        pollForRecords(props, topics, shouldProcessFromBeginning);
+        try {
+            consumer = new org.apache.kafka.clients.consumer.KafkaConsumer<>(props);
+        } catch (KafkaException e) {
+            throw new CliParameterException(e.getMessage());
+        }
+
     }
 
-    private static void pollForRecords(final Properties props, final List<String> topics, final boolean shouldProcessFromBeginning) {
+    @Override
+    public void run() {
+        init();
+        pollForRecords();
+    }
 
-        try (var consumer = new KafkaConsumer<>(props)) {
-
-            final var topicPartitions = topics
-                    .stream()
+    protected void pollForRecords() {
+        try {
+            final var topicPartitions = Arrays.stream(topics)
                     .map(t -> consumer.partitionsFor(t)
                             .stream()
                             .map(p -> new TopicPartition(t, p.partition()))
@@ -43,7 +70,7 @@ public class AvroConsumer {
                     .flatMap(Collection::stream)
                     .collect(Collectors.toList());
 
-            System.out.printf("Subscribing to %s topics across %s partitions\n", topics.size(), topicPartitions.size());
+            System.out.printf("Subscribing to %s topics across %s partitions\n", topics.length, topicPartitions.size());
             consumer.assign(topicPartitions);
 
             if (shouldProcessFromBeginning) {
