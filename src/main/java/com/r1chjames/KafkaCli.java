@@ -5,13 +5,12 @@ import com.r1chjames.kafka.KafkaConsumer;
 import com.r1chjames.kafka.KafkaProducer;
 import picocli.CommandLine;
 
-public class KafkaCli {
+public final class KafkaCli {
 
     public static void main(final String[] args) {
 
         try {
-            final var runner = new CommandRunner();
-            runner.execute(args);
+            CommandRunner.execute(args);
         } catch (final CommandLine.ParameterException | CliParameterException ex) {
             System.err.println("Error: " + ex.getMessage());
             System.err.println("Use --help for usage information.");
@@ -25,8 +24,14 @@ public class KafkaCli {
     }
 }
 
-@CommandLine.Command(mixinStandardHelpOptions = true, subcommands = {KafkaProducer.class, KafkaConsumer.class})
-class SubcommandsMethods implements Runnable {
+@CommandLine.Command(
+    mixinStandardHelpOptions = true,
+    subcommands = {
+        KafkaProducer.class,
+        KafkaConsumer.class
+    }
+)
+final class SubcommandsMethods implements Runnable {
 
     @Override
     public void run() {

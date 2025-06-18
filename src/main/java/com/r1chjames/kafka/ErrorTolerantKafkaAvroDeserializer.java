@@ -3,10 +3,10 @@ package com.r1chjames.kafka;
 import org.apache.avro.Schema;
 import org.apache.kafka.common.errors.SerializationException;
 
-public class ErrorTolerantKafkaAvroDeserializer extends io.confluent.kafka.serializers.KafkaAvroDeserializer {
+public final class ErrorTolerantKafkaAvroDeserializer extends io.confluent.kafka.serializers.KafkaAvroDeserializer {
 
     @Override
-    public Object deserialize(String s, byte[] bytes) {
+    public Object deserialize(final String s, final byte[] bytes) {
         try {
             return deserialize(bytes);
         } catch (SerializationException e) {
@@ -15,7 +15,7 @@ public class ErrorTolerantKafkaAvroDeserializer extends io.confluent.kafka.seria
         }
     }
 
-    public Object deserialize(String s, byte[] bytes, Schema readerSchema) {
+    public Object deserialize(final String s, final byte[] bytes, final Schema readerSchema) {
         try {
             return deserialize(bytes, readerSchema);
         } catch (SerializationException e) {

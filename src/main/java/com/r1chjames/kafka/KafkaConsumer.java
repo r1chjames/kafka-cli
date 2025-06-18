@@ -3,6 +3,7 @@ package com.r1chjames.kafka;
 import com.r1chjames.cli.CliParameterException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -21,10 +22,11 @@ import static com.r1chjames.cli.CommandLineConstants.*;
 
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @picocli.CommandLine.Command(
         name = "consume",
         description = "Consumed from a Kafka topic")
-public class KafkaConsumer extends KafkaProperties implements Runnable {
+public final class KafkaConsumer extends KafkaProperties implements Runnable {
 
     @Setter
     @picocli.CommandLine.Option(names = {SHOULD_PROCESS_FROM_BEGINNING, SPFB},
@@ -84,7 +86,7 @@ public class KafkaConsumer extends KafkaProperties implements Runnable {
                 ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(1L));
                 records.forEach(record -> {
                     System.out.println("------------------------------------------------------");
-                    System.out.printf("Timestamp: %s\n", LocalDateTime.ofInstant(Instant.ofEpochMilli(record.timestamp()), ZoneId.systemDefault()));
+                    System.out.printf("Timestamp: %s\n", readableTimestampRecordTimestamp(record.timestamp()));
                     System.out.printf("Topic: %s\n", record.topic());
                     System.out.printf("Key: %s\n", record.key());
                     System.out.printf("Value: %s\n", record.value());
@@ -100,6 +102,10 @@ public class KafkaConsumer extends KafkaProperties implements Runnable {
         } finally {
             System.out.println("Consumer closed.");
         }
+    }
+
+    private LocalDateTime readableTimestampRecordTimestamp(final long timestamp) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
     }
 }
 

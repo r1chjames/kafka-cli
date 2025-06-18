@@ -8,21 +8,30 @@ buildscript {
         mavenCentral()
         maven { url = "https://plugins.gradle.org/m2/" }
         maven { url = "https://packages.confluent.io/maven/" }
+        gradlePluginPortal()
 
     }
     dependencies {
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
+        classpath "com.gradleup.shadow:shadow-gradle-plugin:8.3.6"
     }
 }
 
 plugins {
     id("io.freefair.lombok") version "8.12.1"
-    id 'checkstyle'
+    id("com.gradleup.shadow") version "8.3.6"
+    id("checkstyle")
+    id("application")
+}
+
+application {
+    mainClass = 'com.r1chjames.KafkaCli'
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: "eclipse"
+apply plugin: "com.gradleup.shadow"
 
 allprojects {
     tasks.withType(JavaCompile) {
@@ -37,11 +46,11 @@ checkstyle {
 }
 
 checkstyleMain {
-    source ='src/main/java'
+    source = 'src/main/java'
 }
 
 checkstyleTest {
-    source ='src/test/java'
+    source = 'src/test/java'
 }
 
 wrapper {

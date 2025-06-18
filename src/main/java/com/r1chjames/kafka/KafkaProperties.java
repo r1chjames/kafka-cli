@@ -9,7 +9,6 @@ import static com.r1chjames.cli.CommandLineConstants.*;
 import static com.r1chjames.kafka.EnhancedConsumerConfig.SCHEMA_REGISTRY_URL;
 import static java.lang.System.currentTimeMillis;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
-import static org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG;
 
 @picocli.CommandLine.Command
 public class KafkaProperties {
@@ -38,7 +37,7 @@ public class KafkaProperties {
             defaultValue = "com.r1chjames.kafka.ErrorTolerantKafkaAvroDeserializer")
     private String defaultValueDeserializer = "com.r1chjames.kafka.ErrorTolerantKafkaAvroDeserializer";
 
-    public Properties parsedConfig() throws ClassNotFoundException {
+    public final Properties parsedConfig() throws ClassNotFoundException {
         return new Properties() {{
             put(GROUP_ID_CONFIG, groupId);
             put(KEY_DESERIALIZER_CLASS_CONFIG, Class.forName(defaultKeyDeserializer));

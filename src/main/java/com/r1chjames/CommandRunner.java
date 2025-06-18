@@ -3,9 +3,9 @@ package com.r1chjames;
 import com.r1chjames.cli.CliParameterException;
 import picocli.CommandLine;
 
-public class CommandRunner {
+public final class CommandRunner {
 
-    public void execute(final String[] args) {
+    public static void execute(final String[] args) {
         final var commandLine = new CommandLine(new SubcommandsMethods());
         commandLine.execute(args);
         commandLine.getCommandSpec().parser().collectErrors(true);

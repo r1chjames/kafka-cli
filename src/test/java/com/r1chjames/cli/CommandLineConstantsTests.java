@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 import static com.r1chjames.cli.CommandLineConstants.*;
 
-public class CommandLineConstantsTests {
+public final class CommandLineConstantsTests {
 
     @ParameterizedTest
     @MethodSource("constantList")

@@ -10,12 +10,12 @@ COPY --chown=gradle:gradle build.gradle settings.gradle $APP_HOME/
 COPY --chown=gradle:gradle src $APP_HOME/src
 COPY --chown=gradle:gradle config $APP_HOME/config
 
-RUN gradle --no-daemon build
+RUN gradle --no-daemon build shadowJar
 
 FROM openjdk:21-jdk-slim
 
 ARG BUILD_HOME
 ENV APP_HOME=$BUILD_HOME
-COPY --from=build-image $APP_HOME/build/libs/kafka-cli.jar app.jar
+COPY --from=build-image $APP_HOME/build/libs/kafka-cli-*all.jar app.jar
 
 ENTRYPOINT java -jar app.jar

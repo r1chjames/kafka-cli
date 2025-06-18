@@ -3,6 +3,7 @@ package com.r1chjames.kafka;
 import com.r1chjames.cli.CliParameterException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.KafkaException;
@@ -16,17 +17,18 @@ import static com.r1chjames.cli.CommandLineConstants.*;
 
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @picocli.CommandLine.Command(
         name = "produce",
         description = "Produces to a Kafka topic"
 )
-public class KafkaProducer extends KafkaProperties implements Runnable {
+public final class KafkaProducer extends KafkaProperties implements Runnable {
 
     @Setter
-    @picocli.CommandLine.Option(names = {TOPICS, T},
-            description = "Topics to produce to",
+    @picocli.CommandLine.Option(names = {TOPIC, T},
+            description = "Topic to produce to",
             required = true)
-    private String[] topic;
+    private String topic;
 
     @Setter
     @picocli.CommandLine.Option(names = {PRODUCE_COUNT, PC},
@@ -67,7 +69,7 @@ public class KafkaProducer extends KafkaProperties implements Runnable {
 
         var recordsSent = new AtomicInteger(0);
 
-        if (topic.length > 1) {
+        if (topic.split(",").length > 1) {
             throw new CliParameterException("Please only provide a single topic to produce to.");
         }
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
@@ -76,7 +78,7 @@ public class KafkaProducer extends KafkaProperties implements Runnable {
         try {
             IntStream.range(0, produceCount).boxed().toList().forEach(i -> {
                 System.out.println(recordsSent.incrementAndGet());
-                sendStringMessage(producer, Arrays.stream(topic).findFirst().get(), produceString);
+                sendStringMessage(producer, topic, produceString);
             });
         } catch (Exception e) {
             throw new CliParameterException(e.getMessage());

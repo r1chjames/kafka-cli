@@ -8,18 +8,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import scala.concurrent.Future;
 
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class KafkaProducerTests {
+public final class KafkaProducerTests {
 
     @Mock
     private Producer<String, String> producer;
@@ -31,11 +29,22 @@ public class KafkaProducerTests {
 
     @BeforeEach
     void beforeTests() {
-        when(producer.send(any())).thenReturn(CompletableFuture.completedFuture(new RecordMetadata(new TopicPartition("test-topic", 0), 0L, 0, 0L, 0, 0)));
+        when(producer.send(any())).thenReturn(
+            CompletableFuture.completedFuture(
+                new RecordMetadata(
+                    new TopicPartition("test-topic", 0),
+                    0L,
+                    0,
+                    0L,
+                    0,
+                    0
+                )
+            )
+        );
         kafkaProducer = KafkaProducer.builder()
             .producer(producer)
             .props(props)
-            .topic(Stream.of("test-topic").toArray(String[]::new))
+            .topic("test-topic")
             .produceCount(1)
             .produceString("test")
             .build();
@@ -49,8 +58,9 @@ public class KafkaProducerTests {
 
     @Test
     void testSendMultipleMessages() {
-        kafkaProducer.setProduceCount(10);
+        final var count = 10;
+        kafkaProducer.setProduceCount(count);
         assertDoesNotThrow(() -> kafkaProducer.sendMessages());
-        verify(producer, times(10)).send(any());
+        verify(producer, times(count)).send(any());
     }
 }

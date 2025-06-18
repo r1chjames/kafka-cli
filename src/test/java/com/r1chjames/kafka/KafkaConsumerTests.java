@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class KafkaConsumerTests {
+public final class KafkaConsumerTests {
 
     @Mock
     private Consumer<Object, Object> consumer;
@@ -38,12 +38,12 @@ public class KafkaConsumerTests {
         when(consumer.poll(any())).thenReturn(
                 new ConsumerRecords<>(
                     Map.of(
-                        new TopicPartition("test-topic", 0), List.of(new ConsumerRecord<>("test-topic", 0, 0L, 1, "test-message"))
+                        new TopicPartition("test-topic", 0),
+                        List.of(new ConsumerRecord<>("test-topic", 0, 0L, 1, "test-message"))
                     )
                 )
             )
             .thenReturn(null);
-        ;
         kafkaConsumer = KafkaConsumer.builder()
             .consumer(consumer)
             .props(props)

@@ -3,10 +3,11 @@ package com.r1chjames.cli;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class CommandLineConstants {
+public final class CommandLineConstants {
     public static final String SHOULD_PROCESS_FROM_BEGINNING = "-shouldProcessFromBeginning";
     public static final String SPFB = "-spfb";
     public static final String TOPICS = "-topics";
+    public static final String TOPIC = "-topic";
     public static final String T = "-t";
     public static final String GROUP_ID = "-groupId";
     public static final String GI = "-gi";
@@ -23,13 +24,14 @@ public class CommandLineConstants {
     public static final String PRODUCE_STRING = "-produceString";
     public static final String PS = "-ps";
 
-    public static String getShortOpt(String longOpt) {
-        return !longOpt.isEmpty()
-                ? Arrays.stream(longOpt.split("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])"))
-                .sequential()
-                .map(w -> w.substring(0,1))
-                .collect(Collectors.joining())
-                .toLowerCase()
-                : "-";
+    public static String getShortOpt(final String longOpt) {
+        return "-".concat(!longOpt.isEmpty()
+            ? Arrays.stream(longOpt.split("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])"))
+            .sequential()
+            .map(s -> s.replace("-", ""))
+            .map(s -> s.substring(0, 1))
+            .collect(Collectors.joining())
+            .toLowerCase()
+            : "");
     }
 }

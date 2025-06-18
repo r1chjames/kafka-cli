@@ -1,9 +1,7 @@
 package com.r1chjames.cli;
 
-import java.util.List;
-
 public class CliParameterException extends RuntimeException {
-    public CliParameterException(String message) {
+    public CliParameterException(final String message) {
         super(message);
     }
 }
