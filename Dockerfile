@@ -18,4 +18,4 @@ ARG BUILD_HOME
 ENV APP_HOME=$BUILD_HOME
 COPY --from=build-image $APP_HOME/build/libs/kafka-cli-*all.jar app.jar
 
-ENTRYPOINT java -jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
