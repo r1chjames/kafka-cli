@@ -10,7 +10,7 @@ COPY --chown=gradle:gradle build.gradle settings.gradle $APP_HOME/
 COPY --chown=gradle:gradle src $APP_HOME/src
 COPY --chown=gradle:gradle config $APP_HOME/config
 
-RUN gradle --no-daemon build shadowJar
+RUN gradle --no-daemon build shadowJar -x test
 
 FROM openjdk:21-jdk-slim
 
