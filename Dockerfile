@@ -1,6 +1,6 @@
 ARG BUILD_HOME=/kafka-cli
 
-FROM gradle:jdk21-corretto as build-image
+FROM gradle:jdk21-corretto AS build-image
 
 ARG BUILD_HOME
 ENV APP_HOME=$BUILD_HOME
