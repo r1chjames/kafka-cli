@@ -46,10 +46,12 @@ public final class KafkaProducer extends KafkaProperties implements Runnable {
     private Properties props;
 
     public void init() {
-        try {
-            props = parsedConfig();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        if (props == null) {
+            try {
+                props = parsedConfig();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         try {
@@ -78,7 +80,7 @@ public final class KafkaProducer extends KafkaProperties implements Runnable {
         try {
             IntStream.range(0, produceCount).boxed().toList().forEach(i -> {
                 System.out.println(recordsSent.incrementAndGet());
-                sendStringMessage(producer, topic, produceString);
+                sendStringMessage(producer, topic, String.valueOf(i), produceString);
             });
         } catch (Exception e) {
             throw new CliParameterException(e.getMessage());
@@ -86,9 +88,9 @@ public final class KafkaProducer extends KafkaProperties implements Runnable {
     }
 
 
-    private static void sendStringMessage(final Producer<String, String> producer, final String topic, final String value) {
+    private static void sendStringMessage(final Producer<String, String> producer, final String topic, final String key, final String value) {
         try {
-            producer.send(new ProducerRecord<>(topic, value)).get();
+            producer.send(new ProducerRecord<>(topic, "key_" + key, value)).get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }

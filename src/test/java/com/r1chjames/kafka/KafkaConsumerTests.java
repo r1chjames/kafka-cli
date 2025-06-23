@@ -54,13 +54,13 @@ public final class KafkaConsumerTests {
 
     @Test
     void testSendWithValidParams() {
-        assertDoesNotThrow(() -> kafkaConsumer.pollForRecords());
+        assertDoesNotThrow(() -> kafkaConsumer.run());
         verify(consumer, times(2)).poll(any());
     }
 
     @Test
     void testSendConsumeFromBeginning() {
-        assertDoesNotThrow(() -> kafkaConsumer.pollForRecords());
+        assertDoesNotThrow(() -> kafkaConsumer.run());
         verify(consumer, times(1)).partitionsFor(any());
         verify(consumer, times(2)).poll(any());
     }
