@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.SerializationException;
@@ -42,20 +42,29 @@ public final class KafkaConsumer extends KafkaProperties implements Runnable {
 
     private Consumer<Object, Object> consumer;
     private Properties props;
+    private java.util.function.Consumer<ConsumerRecord<Object, Object>> messageHandler;
+    private Duration pollPeriod;
 
     private void init() {
-        try {
-            props = parsedConfig();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        if (props == null) {
+            try {
+                props = parsedConfig();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
 
-        try {
-            consumer = new org.apache.kafka.clients.consumer.KafkaConsumer<>(props);
-        } catch (KafkaException e) {
-            throw new CliParameterException(e.getMessage());
+        if (messageHandler == null) {
+            messageHandler = defaultMessageHandler();
         }
 
+        if (consumer == null) {
+            try {
+                consumer = new org.apache.kafka.clients.consumer.KafkaConsumer<>(props);
+            } catch (KafkaException e) {
+                throw new CliParameterException(e.getMessage());
+            }
+        }
     }
 
     @Override
@@ -64,7 +73,7 @@ public final class KafkaConsumer extends KafkaProperties implements Runnable {
         pollForRecords();
     }
 
-    protected void pollForRecords() {
+    void pollForRecords() {
         try {
             final var topicPartitions = Arrays.stream(topics)
                     .map(t -> consumer.partitionsFor(t)
@@ -82,16 +91,22 @@ public final class KafkaConsumer extends KafkaProperties implements Runnable {
                 consumer.seekToBeginning(topicPartitions);
             }
 
-            while (true) {
-                ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(1L));
-                records.forEach(record -> {
-                    System.out.println("------------------------------------------------------");
-                    System.out.printf("Timestamp: %s\n", readableTimestampRecordTimestamp(record.timestamp()));
-                    System.out.printf("Topic: %s\n", record.topic());
-                    System.out.printf("Key: %s\n", record.key());
-                    System.out.printf("Value: %s\n", record.value());
-                });
-                consumer.commitSync();
+            if (pollPeriod == null || pollPeriod.isNegative()) {
+                // Case 1: Run indefinitely until the application is stopped.
+                System.out.println("Polling for records indefinitely...");
+                // A proper shutdown hook would be needed to break this loop gracefully.
+                while (true) {
+                    poll();
+                }
+            } else {
+                // Case 2: Run for the specified duration.
+                System.out.printf("Polling for records for a duration of %s...\n", pollPeriod);
+                Instant endTime = Instant.now().plus(pollPeriod);
+
+                while (Instant.now().isBefore(endTime)) {
+                    poll();
+                }
+                System.out.println("Finished polling after the specified duration.");
             }
         } catch (SerializationException e) {
             System.err.println("Error deserializing records: " + e.getMessage());
@@ -102,6 +117,21 @@ public final class KafkaConsumer extends KafkaProperties implements Runnable {
         } finally {
             System.out.println("Consumer closed.");
         }
+    }
+
+    private void poll() {
+        consumer.poll(Duration.ofSeconds(1L)).forEach(record -> messageHandler.accept(record));
+        consumer.commitSync();
+    }
+
+    private java.util.function.Consumer<ConsumerRecord<Object, Object>> defaultMessageHandler() {
+        return record -> {
+            System.out.println("------------------------------------------------------");
+            System.out.printf("Timestamp: %s\n", readableTimestampRecordTimestamp(record.timestamp()));
+            System.out.printf("Topic: %s\n", record.topic());
+            System.out.printf("Key: %s\n", record.key());
+            System.out.printf("Value: %s\n", record.value());
+        };
     }
 
     private LocalDateTime readableTimestampRecordTimestamp(final long timestamp) {
