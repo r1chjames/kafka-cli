@@ -1,4 +1,4 @@
-name: ci-pipeline
+name: ci-pr-verify
 on:
   pull_request:
     types:
@@ -31,3 +31,9 @@ jobs:
 
       - name: Run Unit Tests
         run: ./gradlew clean test
+
+      - name: Run Checkstyle Main
+        run: ./gradlew checkstyleMain
+
+      - name: Run Checkstyle Test
+        run: ./gradlew checkstyleTest
