@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,23 +15,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.awaitility.Awaitility.await;
 
-public class KafkaConsumerIT extends KafkaTest {
+public final class KafkaConsumerIT extends KafkaTest {
 
     private KafkaTestUtils kafkaTestUtils;
     private static final String TOPIC = "topic-1";
+    private static final int POLL_SECONDS = 5;
 
     @BeforeEach
     void setUp() {
-        kafkaTestUtils = sharedKafkaTestResource.getKafkaTestUtils();
+        kafkaTestUtils = TEST_KAFKA.getKafkaTestUtils();
         kafkaTestUtils.createTopic(TOPIC, 1, (short) 1);
-        consumedRecords = new ArrayList<>();
+        resetConsumedRecords();
     }
 
     private KafkaConsumer createConsumer(final boolean shouldProcessFromBeginning) {
         return KafkaConsumer.builder()
             .topics(List.of(TOPIC).toArray(new String[0]))
             .props(localKafkaProps(kafkaTestUtils.describeClusterNodes()))
-            .pollPeriod(Duration.ofSeconds(5)) // A short poll period for tests is good
+            .pollPeriod(Duration.ofSeconds(POLL_SECONDS))
             .shouldProcessFromBeginning(shouldProcessFromBeginning)
             .messageHandler(testMessageHandler())
             .build();
@@ -47,9 +47,9 @@ public class KafkaConsumerIT extends KafkaTest {
         );
 
         createConsumer(true).run();
-        await().atMost(5, SECONDS).until(() -> !consumedRecords.isEmpty());
+        await().atMost(ASSERT_WAIT_SECONDS, SECONDS).until(() -> !getConsumedRecords().isEmpty());
 
-        assertThat(consumedRecords)
+        assertThat(getConsumedRecords())
             .isNotNull()
             .hasSize(1)
             .extracting(ConsumerRecord::topic, ConsumerRecord::key, ConsumerRecord::value)
