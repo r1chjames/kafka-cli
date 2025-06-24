@@ -88,7 +88,8 @@ public final class KafkaProducer extends KafkaProperties implements Runnable {
     }
 
 
-    private static void sendStringMessage(final Producer<String, String> producer, final String topic, final String key, final String value) {
+    private static void sendStringMessage(final Producer<String, String> producer,
+                                          final String topic, final String key, final String value) {
         try {
             producer.send(new ProducerRecord<>(topic, "key_" + key, value)).get();
         } catch (InterruptedException | ExecutionException e) {

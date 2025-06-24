@@ -9,36 +9,35 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
-public class KafkaProducerIT extends KafkaTest {
+public final class KafkaProducerIT extends KafkaTest {
 
     private KafkaTestUtils kafkaTestUtils;
     private static final String TOPIC = "topic-1";
 
     @BeforeEach
     void setUp() {
-        // The KAFKA resource is static and shared, but we can get a fresh
-        // test utility instance for each test.
-        kafkaTestUtils = sharedKafkaTestResource.getKafkaTestUtils();
+        kafkaTestUtils = TEST_KAFKA.getKafkaTestUtils();
         kafkaTestUtils.createTopic(TOPIC, 1, (short) 1);
     }
 
-    private KafkaProducer createProducer(final String message) {
+    private KafkaProducer createProducer(final String message, final int count) {
         return KafkaProducer.builder()
             .topic(TOPIC)
             .props(localKafkaProps(kafkaTestUtils.describeClusterNodes()))
-            .produceCount(5)
+            .produceCount(count)
             .produceString(message)
             .build();
     }
 
     @Test
     void testProduce() {
-        createProducer("Sample message").run();
+        final var count = 5;
+        createProducer("Sample message", count).run();
         final var records = kafkaTestUtils.consumeAllRecordsFromTopic(TOPIC);
 
         assertThat(records)
             .isNotNull()
-            .hasSize(5)
+            .hasSize(count)
             .extracting(ConsumerRecord::topic, ConsumerRecord::key, ConsumerRecord::value)
             .containsExactly(
                 tuple(TOPIC, "key_0".getBytes(), "Sample message".getBytes()),
